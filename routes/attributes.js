@@ -46,6 +46,19 @@ router.get('/weekly_goals/', function (req, res, next) {
     )
 });
 
+router.get('/weekly_goals/:goal', function (req, res, next) {
+    db.query("SELECT * FROM weekly_goals WHERE calorie_diff " + (req.params.goal == 1 ? "<" : req.params.goal == 2 ? "=" : ">") + " 0",
+        (error, result) => {
+            if (error) {
+                res.json({ message: 'A MySql error occurred.' });
+            }
+            else {
+                res.json(result);
+            }
+        }
+    )
+});
+
 router.get('/activity_levels/', function (req, res, next) {
     db.query("SELECT * FROM activity_levels",
         (error, result) => {
