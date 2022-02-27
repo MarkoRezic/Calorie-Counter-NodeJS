@@ -8,7 +8,7 @@ const { JWT_SECRET } = process.env;
 
 /* GET users listing. */
 router.get('/', function (req, res, next) {
-  db.query("SELECT u.*, r.name role, m.name model, g.name gender, w.calorie_diff weekly_calorie_diff, a.coefficient activity_coefficient FROM users u JOIN roles r ON u.role_id = r.role_id JOIN models m ON u.model_id = m.model_id JOIN genders g ON u.gender_id = g.gender_id JOIN weekly_goals w ON u.weekly_goal_id = w.weekly_goal_id JOIN activity_levels a ON u.activity_level_id = a.activity_level_id",
+  db.query("SELECT u.*, r.name role, m.name model, g.name gender, w.calorie_diff weekly_calorie_diff, w.description weekly_description, a.coefficient activity_coefficient, a.description activity_description FROM users u JOIN roles r ON u.role_id = r.role_id JOIN models m ON u.model_id = m.model_id JOIN genders g ON u.gender_id = g.gender_id JOIN weekly_goals w ON u.weekly_goal_id = w.weekly_goal_id JOIN activity_levels a ON u.activity_level_id = a.activity_level_id",
     (error, result) => {
       if (error) {
         res.json({ message: 'A MySql error occurred.' });
@@ -21,7 +21,7 @@ router.get('/', function (req, res, next) {
 });
 
 router.get('/:id', function (req, res, next) {
-  db.query("SELECT u.*, r.name role, m.name model, g.name gender, w.calorie_diff weekly_calorie_diff, a.coefficient activity_coefficient FROM users u JOIN roles r ON u.role_id = r.role_id JOIN models m ON u.model_id = m.model_id JOIN genders g ON u.gender_id = g.gender_id JOIN weekly_goals w ON u.weekly_goal_id = w.weekly_goal_id JOIN activity_levels a ON u.activity_level_id = a.activity_level_id WHERE user_id = " + req.params.id,
+  db.query("SELECT u.*, r.name role, m.name model, g.name gender, w.calorie_diff weekly_calorie_diff, w.description weekly_description, a.coefficient activity_coefficient, a.description activity_description FROM users u JOIN roles r ON u.role_id = r.role_id JOIN models m ON u.model_id = m.model_id JOIN genders g ON u.gender_id = g.gender_id JOIN weekly_goals w ON u.weekly_goal_id = w.weekly_goal_id JOIN activity_levels a ON u.activity_level_id = a.activity_level_id WHERE user_id = " + req.params.id,
     (error, result) => {
       if (error) {
         res.json({ message: 'A MySql error occurred.' });
@@ -73,7 +73,7 @@ router.post('/register', function (req, res, next) {
 router.post('/login', function (req, res, next) {
   const { username, password } = req.body;
   console.log(req.body);
-  db.query("SELECT u.*, r.name role, m.name model, g.name gender, w.calorie_diff weekly_calorie_diff, a.coefficient activity_coefficient FROM users u JOIN roles r ON u.role_id = r.role_id JOIN models m ON u.model_id = m.model_id JOIN genders g ON u.gender_id = g.gender_id JOIN weekly_goals w ON u.weekly_goal_id = w.weekly_goal_id JOIN activity_levels a ON u.activity_level_id = a.activity_level_id WHERE username = ? AND password = ?",
+  db.query("SELECT u.*, r.name role, m.name model, g.name gender, w.calorie_diff weekly_calorie_diff, w.description weekly_description, a.coefficient activity_coefficient, a.description activity_description FROM users u JOIN roles r ON u.role_id = r.role_id JOIN models m ON u.model_id = m.model_id JOIN genders g ON u.gender_id = g.gender_id JOIN weekly_goals w ON u.weekly_goal_id = w.weekly_goal_id JOIN activity_levels a ON u.activity_level_id = a.activity_level_id WHERE username = ? AND password = ?",
     [username, password],
     (error, result) => {
       if (error) {
@@ -100,7 +100,7 @@ router.get('/token/:jwt', function (req, res, next) {
       res.json({ error: 3, message: 'Neispravan jwt.' });
     }
     else {
-      db.query("SELECT u.*, r.name role, m.name model, g.name gender, w.calorie_diff weekly_calorie_diff, a.coefficient activity_coefficient FROM users u JOIN roles r ON u.role_id = r.role_id JOIN models m ON u.model_id = m.model_id JOIN genders g ON u.gender_id = g.gender_id JOIN weekly_goals w ON u.weekly_goal_id = w.weekly_goal_id JOIN activity_levels a ON u.activity_level_id = a.activity_level_id WHERE u.user_id = ?",
+      db.query("SELECT u.*, r.name role, m.name model, g.name gender, w.calorie_diff weekly_calorie_diff, w.description weekly_description, a.coefficient activity_coefficient, a.description activity_description FROM users u JOIN roles r ON u.role_id = r.role_id JOIN models m ON u.model_id = m.model_id JOIN genders g ON u.gender_id = g.gender_id JOIN weekly_goals w ON u.weekly_goal_id = w.weekly_goal_id JOIN activity_levels a ON u.activity_level_id = a.activity_level_id WHERE u.user_id = ?",
         [user_id],
         (error, result) => {
           if (error) {

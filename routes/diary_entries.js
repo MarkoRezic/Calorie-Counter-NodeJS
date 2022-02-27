@@ -45,4 +45,53 @@ router.get('/user/:user_id/date/:date', function (req, res, next) {
     )
 });
 
+router.post('/', function (req, res, next) {
+    const { user_id, product_id, meal_type_id, amount, datetime } = req.body;
+    console.log(req.body);
+    db.query("INSERT INTO diary_entries (user_id, product_id, meal_type_id, amount, diary_entries.datetime) VALUES (?,?,?,?,DATE(?));",
+        [user_id, product_id, meal_type_id, amount, datetime],
+        (error, result) => {
+            if (error) {
+                console.log(error);
+                res.json({ error: 1, message: 'A MySql error occurred.' });
+            }
+            else {
+                res.json({ error: 0 });
+            }
+        }
+    )
+});
+
+router.put('/', function (req, res, next) {
+    const { diary_entry_id, amount } = req.body;
+    console.log(req.body);
+    db.query("UPDATE diary_entries SET amount = ? WHERE diary_entry_id = ?",
+        [amount, diary_entry_id],
+        (error, result) => {
+            if (error) {
+                console.log(error);
+                res.json({ error: 1, message: 'A MySql error occurred.' });
+            }
+            else {
+                res.json({ error: 0 });
+            }
+        }
+    )
+});
+
+router.delete('/:id', function (req, res, next) {
+    db.query("DELETE FROM diary_entries WHERE diary_entry_id = ?",
+        [req.params.id],
+        (error, result) => {
+            if (error) {
+                console.log(error);
+                res.json({ error: 1, message: 'A MySql error occurred.' });
+            }
+            else {
+                res.json({ error: 0 });
+            }
+        }
+    )
+});
+
 module.exports = router;
