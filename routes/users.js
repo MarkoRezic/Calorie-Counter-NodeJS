@@ -73,7 +73,7 @@ router.post('/register', function (req, res, next) {
 router.post('/login', function (req, res, next) {
   const { username, password } = req.body;
   console.log(req.body);
-  db.query("SELECT u.*, r.name role, m.name model, g.name gender, w.calorie_diff weekly_calorie_diff, w.description weekly_description, a.coefficient activity_coefficient, a.description activity_description FROM users u JOIN roles r ON u.role_id = r.role_id JOIN models m ON u.model_id = m.model_id JOIN genders g ON u.gender_id = g.gender_id JOIN weekly_goals w ON u.weekly_goal_id = w.weekly_goal_id JOIN activity_levels a ON u.activity_level_id = a.activity_level_id WHERE username = ? AND password = ?",
+  db.query("SELECT u.*, r.name role, m.name model, g.name gender, w.calorie_diff weekly_calorie_diff, w.description weekly_description, a.coefficient activity_coefficient, a.description activity_description FROM users u JOIN roles r ON u.role_id = r.role_id JOIN models m ON u.model_id = m.model_id JOIN genders g ON u.gender_id = g.gender_id JOIN weekly_goals w ON u.weekly_goal_id = w.weekly_goal_id JOIN activity_levels a ON u.activity_level_id = a.activity_level_id WHERE username = ? AND password = ? AND blocked = 0",
     [username, password],
     (error, result) => {
       if (error) {
@@ -84,7 +84,7 @@ router.post('/login', function (req, res, next) {
         res.json({ user: result[0], token: jwt.sign(result[0]["user_id"], JWT_SECRET), error: 0 });
       }
       else {
-        res.json({ error: 1, message: 'Neispravni podaci.' });
+        res.json({ error: 1, message: 'Neispravni podaci ili je korisnik blokiran.' });
       }
     }
   )
@@ -100,7 +100,7 @@ router.get('/token/:jwt', function (req, res, next) {
       res.json({ error: 3, message: 'Neispravan jwt.' });
     }
     else {
-      db.query("SELECT u.*, r.name role, m.name model, g.name gender, w.calorie_diff weekly_calorie_diff, w.description weekly_description, a.coefficient activity_coefficient, a.description activity_description FROM users u JOIN roles r ON u.role_id = r.role_id JOIN models m ON u.model_id = m.model_id JOIN genders g ON u.gender_id = g.gender_id JOIN weekly_goals w ON u.weekly_goal_id = w.weekly_goal_id JOIN activity_levels a ON u.activity_level_id = a.activity_level_id WHERE u.user_id = ?",
+      db.query("SELECT u.*, r.name role, m.name model, g.name gender, w.calorie_diff weekly_calorie_diff, w.description weekly_description, a.coefficient activity_coefficient, a.description activity_description FROM users u JOIN roles r ON u.role_id = r.role_id JOIN models m ON u.model_id = m.model_id JOIN genders g ON u.gender_id = g.gender_id JOIN weekly_goals w ON u.weekly_goal_id = w.weekly_goal_id JOIN activity_levels a ON u.activity_level_id = a.activity_level_id WHERE u.user_id = ? AND u.blocked = 0",
         [user_id],
         (error, result) => {
           if (error) {
@@ -111,12 +111,46 @@ router.get('/token/:jwt', function (req, res, next) {
             res.json({ user: result[0], error: 0 });
           }
           else {
-            res.json({ error: 1, message: 'Korisnik nije pronađen.' });
+            res.json({ error: 1, message: 'Korisnik nije pronađen ili je blokiran.' });
           }
         }
       )
     }
   });
+});
+
+router.put('/promote', function (req, res, next) {
+  const { user_id, role_id } = req.body;
+  console.log(req.body);
+  db.query("UPDATE users SET role_id = ? WHERE user_id = ?",
+    [role_id, user_id],
+    (error, result) => {
+      if (error) {
+        console.log(error);
+        res.json({ error: 1, message: 'A MySql error occurred.' });
+      }
+      else {
+        res.json({ error: 0 });
+      }
+    }
+  )
+});
+
+router.put('/block', function (req, res, next) {
+  const { user_id, blocked } = req.body;
+  console.log(req.body);
+  db.query("UPDATE users SET blocked = ? WHERE user_id = ?",
+    [blocked, user_id],
+    (error, result) => {
+      if (error) {
+        console.log(error);
+        res.json({ error: 1, message: 'A MySql error occurred.' });
+      }
+      else {
+        res.json({ error: 0 });
+      }
+    }
+  )
 });
 
 module.exports = router;
