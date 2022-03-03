@@ -153,4 +153,21 @@ router.put('/block', function (req, res, next) {
   )
 });
 
+router.put('/settings', function (req, res, next) {
+  const { user_id, height, weight, goal_weight, age, model_id, gender_id, weekly_goal_id, activity_level_id } = req.body;
+  console.log(req.body);
+  db.query("UPDATE users SET height = ?, weight = ?, goal_weight = ?, age = ?, model_id = ?, gender_id = ?, weekly_goal_id = ?, activity_level_id = ? WHERE user_id = ?",
+    [height, weight, goal_weight, age, model_id, gender_id, weekly_goal_id, activity_level_id, user_id],
+    (error, result) => {
+      if (error) {
+        console.log(error);
+        res.json({ error: 1, message: 'A MySql error occurred.' });
+      }
+      else {
+        res.json({ error: 0 });
+      }
+    }
+  )
+});
+
 module.exports = router;
